@@ -1,35 +1,48 @@
-import {Resources} from "../assets/resources-list"
 import {ResourcesData} from "../assets/resources"
 import Select from "react-select"
 import { useState } from 'react';
 import {ResponsiveBar} from "@nivo/bar";
 
-export default function Home({resources, data}) {
-  const [barData, setBarData] = useState(data);
-  let selectOptions = resources.map(obj => ({label:obj.node.name, value: obj.node.id}));
-  console.log(data);
-  let onInputChange = (inputValue) => {
-    console.log(inputValue);
-    if (inputValue.length == 0) {
-        setBarData(data)
+export default function Home({data}) {
+  let selectOptions = data.map(obj => ({label:obj.key, value: obj.key}))
+  let initialSelectOptions = filterMultiSelectSelectedOptions(selectOptions, ["system:serviceaccount:openshift-kube-apiserver-operator:kube-apiserver-operator", "system:serviceaccount:openshift-authentication-operator:authentication-operator", "system:serviceaccount:openshift-apiserver-operator:openshift-apiserver-operator"])
+  const [selectValue, setSelectValue] = useState(initialSelectOptions)
+
+  const barIndexKey = "key"
+  const initialBarDataset = filterDataset(data, initialSelectOptions)
+  const [barData, setBarData] = useState(initialBarDataset)
+  const [barKeys, setBarKeys] = useState(getOnlyKeys(initialBarDataset, barIndexKey))
+
+
+  // reactor
+  let onInputChange = (selectedValues) => {
+    let barDatasetToDisplay = initialBarDataset
+    if (selectedValues.length == 0) {
+        setBarData(barDatasetToDisplay)
+        setSelectValue(initialSelectOptions)
     } else {
-        setBarData([data[4]])
+        barDatasetToDisplay = filterDataset(data, selectedValues)
+        setBarData(filterDataset(data, selectedValues))
+        setSelectValue(selectedValues)
     }
-  };
+    setBarKeys(getOnlyKeys(barDatasetToDisplay, barIndexKey))
+  }
+
   return (
-      <div style={{height: 800}}>
+      <div style={{height: 700, margin: 0}}>
       <Select
           closeMenuOnSelect={false}
           options={selectOptions}
+          value={selectValue}
           onChange={onInputChange}
           isMulti
       />
       <ResponsiveBar
               data={barData}
               layout="horizontal"
-              keys={[ 'hot dog', 'burger', 'sandwich', 'kebab', 'fries', 'donut' ]}
-              indexBy="country"
-              margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
+              keys={barKeys}
+              indexBy={barIndexKey}
+              margin={{ top: 50, right: 100, bottom: 50, left: 450 }}
               padding={0.3}
               valueScale={{ type: 'linear' }}
               indexScale={{ type: 'band', round: true }}
@@ -75,7 +88,6 @@ export default function Home({resources, data}) {
                   tickSize: 5,
                   tickPadding: 5,
                   tickRotation: 0,
-                  legend: 'country',
                   legendPosition: 'middle',
                   legendOffset: 32
               }}
@@ -83,37 +95,13 @@ export default function Home({resources, data}) {
                   tickSize: 5,
                   tickPadding: 5,
                   tickRotation: 0,
-                  legend: 'food',
                   legendPosition: 'middle',
                   legendOffset: -40
               }}
               labelSkipWidth={12}
               labelSkipHeight={12}
               labelTextColor={{ from: 'color', modifiers: [ [ 'darker', 1.6 ] ] }}
-              legends={[
-                  {
-                      dataFrom: 'keys',
-                      anchor: 'bottom-right',
-                      direction: 'column',
-                      justify: false,
-                      translateX: 120,
-                      translateY: 0,
-                      itemsSpacing: 2,
-                      itemWidth: 100,
-                      itemHeight: 20,
-                      itemDirection: 'left-to-right',
-                      itemOpacity: 0.85,
-                      symbolSize: 20,
-                      effects: [
-                          {
-                              on: 'hover',
-                              style: {
-                                  itemOpacity: 1
-                              }
-                          }
-                      ]
-                  }
-              ]}
+              legends={[]}
               animate={true}
               motionStiffness={90}
               motionDamping={15}
@@ -125,8 +113,33 @@ export default function Home({resources, data}) {
 export async function getStaticProps() {
   return {
     props: {
-      resources: Resources,
       data: ResourcesData,
     },
   }
+}
+
+function filterDataset(data, filters) {
+   let filterLabels = filters.map(filter => filter.label)
+   return data.filter(item => filterLabels.includes(item.key))
+}
+
+function filterMultiSelectSelectedOptions(data, preSelectedOptions) {
+    return data.filter(item => preSelectedOptions.includes(item.label))
+}
+
+function getOnlyKeys(data, indexKey) {
+    let arrays = data.map(item => Object.keys(item))
+    let keys = mergeArrays(arrays)
+    return keys.filter(key => key != indexKey)
+}
+
+function mergeArrays(arrays) {
+    let mergedArray = []
+
+    arrays.forEach(array => {
+        mergedArray = [...mergedArray, ...array]
+    })
+
+    let uniqueArr = [...new Set(mergedArray)];
+    return uniqueArr
 }
