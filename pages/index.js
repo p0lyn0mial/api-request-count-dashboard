@@ -1,11 +1,16 @@
-import {ResourcesData} from "../assets/resources"
+import {DataSet} from "../assets/requests-count"
 import Select from "react-select"
 import { useState } from 'react';
 import {ResponsiveBar} from "@nivo/bar";
 
 export default function Home({data}) {
-  let selectOptions = data.map(obj => ({label:obj.key, value: obj.key}))
-  let initialSelectOptions = filterMultiSelectSelectedOptions(selectOptions, ["system:serviceaccount:openshift-kube-apiserver-operator:kube-apiserver-operator", "system:serviceaccount:openshift-authentication-operator:authentication-operator", "system:serviceaccount:openshift-apiserver-operator:openshift-apiserver-operator"])
+  const selectOptions = data.map(obj => ({label:obj.key, value: obj.key}))
+  let initialSelectOptions = [{}]
+  if (data.length >= 5) {
+      initialSelectOptions = data.slice(0, 5).map(obj => ({label:obj.key, value: obj.key}))
+  } else {
+      initialSelectOptions = data.map(obj => ({label:obj.key, value: obj.key}))
+  }
   const [selectValue, setSelectValue] = useState(initialSelectOptions)
 
   const barIndexKey = "key"
@@ -14,17 +19,11 @@ export default function Home({data}) {
   const [barKeys, setBarKeys] = useState(getOnlyKeys(initialBarDataset, barIndexKey))
 
 
-  // reactor
+  // multi-select "on-select" reactor
   let onInputChange = (selectedValues) => {
-    let barDatasetToDisplay = initialBarDataset
-    if (selectedValues.length == 0) {
-        setBarData(barDatasetToDisplay)
-        setSelectValue(initialSelectOptions)
-    } else {
-        barDatasetToDisplay = filterDataset(data, selectedValues)
-        setBarData(filterDataset(data, selectedValues))
-        setSelectValue(selectedValues)
-    }
+    let barDatasetToDisplay = filterDataset(data, selectedValues)
+    setBarData(barDatasetToDisplay)
+    setSelectValue(selectedValues)
     setBarKeys(getOnlyKeys(barDatasetToDisplay, barIndexKey))
   }
 
@@ -42,7 +41,7 @@ export default function Home({data}) {
               layout="horizontal"
               keys={barKeys}
               indexBy={barIndexKey}
-              margin={{ top: 50, right: 100, bottom: 50, left: 450 }}
+              margin={{ top: 50, right: 450, bottom: 50, left: 450 }}
               padding={0.3}
               valueScale={{ type: 'linear' }}
               indexScale={{ type: 'band', round: true }}
@@ -110,23 +109,23 @@ export default function Home({data}) {
   )
 }
 
+// this method loads data from the assets directory
 export async function getStaticProps() {
   return {
     props: {
-      data: ResourcesData,
+      data: DataSet,
     },
   }
 }
 
+// this method takes only selected (multi-select) items
 function filterDataset(data, filters) {
    let filterLabels = filters.map(filter => filter.label)
    return data.filter(item => filterLabels.includes(item.key))
 }
 
-function filterMultiSelectSelectedOptions(data, preSelectedOptions) {
-    return data.filter(item => preSelectedOptions.includes(item.label))
-}
-
+// this method extracts keys except the indexKey
+// data: [ {key:"foo", "x":"y"}, {"key":"bar", "x":"y"} ]
 function getOnlyKeys(data, indexKey) {
     let arrays = data.map(item => Object.keys(item))
     let keys = mergeArrays(arrays)
