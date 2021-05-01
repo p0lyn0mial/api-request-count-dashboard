@@ -1,13 +1,82 @@
-import {useParams} from "react-router-dom"
+import {ResponsiveBar} from "@nivo/bar";
 
-export default function Details({props}) {
-   // retrieve params into a variable
-   const params = useParams()
+import {store} from "../assets/store"
+import {getOnlyKeys, filterDataset} from "../assets/dataset"
 
-   // print params to console
-   console.log(params)
+export default function Details() {
+   // common
+   const barIndexKey = "key"
+
+   const state = store.getState()
+   const barData = filterDataset(state.dataSetView, [{label: state.selectedRowID}])
+   const barKeys = getOnlyKeys(barData, barIndexKey)
+
+   let goBackOnClick = () => {
+       console.log(window.location)
+       window.location.href = "#main"
+   }
 
    return(
-       <div>this is details page {params}</div>
+       <div style={{height: 95 + "vh"}}>
+           <button type="button" onClick={goBackOnClick} >
+               go back
+           </button>
+           <ResponsiveBar
+               data={barData}
+               keys={barKeys}
+               indexBy={barIndexKey}
+               margin={{ top: 50, right: 60, bottom: 50, left: 60 }}
+               padding={0}
+               groupMode="grouped"
+               valueScale={{ type: 'linear' }}
+               indexScale={{ type: 'band', round: true }}
+               colors={{ scheme: 'nivo' }}
+               defs={[
+                   {
+                       id: 'dots',
+                       type: 'patternDots',
+                       background: 'inherit',
+                       color: '#38bcb2',
+                       size: 4,
+                       padding: 1,
+                       stagger: true
+                   },
+                   {
+                       id: 'lines',
+                       type: 'patternLines',
+                       background: 'inherit',
+                       color: '#eed312',
+                       rotation: -45,
+                       lineWidth: 6,
+                       spacing: 10
+                   }
+               ]}
+               borderColor={{ from: 'color', modifiers: [ [ 'darker', 2.5 ] ] }}
+               borderWidth={2}
+               axisTop={null}
+               axisRight={null}
+               axisBottom={{
+                   tickSize: 5,
+                   tickPadding: 5,
+                   tickRotation: 0,
+                   legendPosition: 'middle',
+                   legendOffset: 32
+               }}
+               axisLeft={{
+                   tickSize: 5,
+                   tickPadding: 5,
+                   tickRotation: 0,
+                   legendPosition: 'middle',
+                   legendOffset: -40
+               }}
+               labelSkipWidth={12}
+               labelSkipHeight={12}
+               labelTextColor={{ from: 'color', modifiers: [ [ 'darker', 3 ] ] }}
+               legends={[]}
+               animate={true}
+               motionStiffness={90}
+               motionDamping={15}
+           />
+       </div>
    )
 }
