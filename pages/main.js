@@ -3,17 +3,11 @@ import Select from "react-select"
 
 import {ResponsiveBar} from "@nivo/bar"
 
-import {DataSet} from "../assets/requests-count"
 import {store, setDataSetView, setSelectedRowID, setSelectedOptions} from "../assets/store"
 import {filterDataset, getOnlyKeys} from "../assets/dataset"
 
 export default function Main({data}) {
-   const state = store.getState()
-   //console.log(state)
-   if (state.dataSetView && state.dataSetView.length > 0 ) {
-       console.log("weve got a state")
-       //data = state.dataSetView
-   }
+  const state = store.getState()
 
   let initialSelectOptions = [{}]
   if (!state.selectedOptions || state.selectedOptions.length == 0) {
@@ -53,6 +47,7 @@ export default function Main({data}) {
 
   return (
       <div style={{height: 80 + "vh", margin: 0}}>
+      <h4>You are currently viewing top {barData.length} out of {data.length} items. Use the multi select below to remove or add filters. Clicking on a row allows you to see more details for a selected item.</h4>
       <Select
           closeMenuOnSelect={false}
           options={selectOptions}
@@ -133,13 +128,4 @@ export default function Main({data}) {
           />
       </div>
   )
-}
-
-// this method loads data from the assets directory
-export async function getStaticProps() {
-  return {
-    props: {
-      data: DataSet,
-    },
-  }
 }

@@ -2,37 +2,32 @@ import React from "react"
 
 import Details from "./details"
 import Main from "./main"
-import {DataSet} from "../assets/requests-count";
-import {store} from "../assets/store";
+import {DataSet} from "../assets/requests-count"
 
 export default class Index extends React.Component {
     constructor(props) {
         super(props)
-        this.state = {page: "index"}
+        // by default we are going to display the main page
+        this.state = {page: "main"}
     }
 
-    updatePage = () => {
-        this.setState({page: window.location.hash})
-    }
+    // react to updates in the url address
+    onURLAddressChange = () => { this.setState({page: window.location.hash}) }
 
-    componentDidMount() {
-        window.addEventListener("hashchange", this.updatePage)
-    }
+    // register to updates in the url address
+    componentDidMount() { window.addEventListener("hashchange", this.onURLAddressChange) }
 
     render() {
-        const state = store.getState()
-        console.log("index")
-        console.log(state)
-        let component
+        let componentToDisplay
 
         if (this.state.page === "#details") {
-            component = <Details/>
+            componentToDisplay = <Details/>
         } else {
-            component = <Main data={this.props.data}/>
+            componentToDisplay = <Main data={this.props.data}/>
         }
 
         return(
-            <div>{component}</div>
+            <div>{componentToDisplay}</div>
         )
     }
 }

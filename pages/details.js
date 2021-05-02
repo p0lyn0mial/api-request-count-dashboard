@@ -11,22 +11,22 @@ export default function Details() {
    const barData = filterDataset(state.dataSetView, [{label: state.selectedRowID}])
    const barKeys = getOnlyKeys(barData, barIndexKey)
 
-   let goBackOnClick = () => {
-       console.log(window.location)
+   let onGoBackClick = () => {
        window.location.href = "#main"
    }
 
    return(
        <div style={{height: 95 + "vh"}}>
-           <button type="button" onClick={goBackOnClick} >
-               go back
-           </button>
+           <h4>
+               You are currently viewing {state.selectedRowID} with {barKeys.length} distinct values. To go to the previous page <button type="button" onClick={onGoBackClick} > click </button>
+           </h4>
            <ResponsiveBar
                data={barData}
                keys={barKeys}
                indexBy={barIndexKey}
                margin={{ top: 50, right: 60, bottom: 50, left: 60 }}
                padding={0}
+               minValue={0}
                groupMode="grouped"
                valueScale={{ type: 'linear' }}
                indexScale={{ type: 'band', round: true }}
