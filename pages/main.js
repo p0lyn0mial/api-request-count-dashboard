@@ -7,6 +7,7 @@ import {store, setDataSetView, setSelectedRowID, setSelectedOptions} from "../as
 import {filterDataset, getOnlyKeys} from "../assets/dataset"
 
 export default function Main({data}) {
+  if (!Array.isArray(data)) { data = [] }
   const state = store.getState()
 
   let initialSelectOptions = [{}]
