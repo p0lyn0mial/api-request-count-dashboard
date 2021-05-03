@@ -2,6 +2,7 @@ import { useState } from "react"
 import Select from "react-select"
 
 import {ResponsiveBar} from "@nivo/bar"
+import { Chip } from "@nivo/tooltip"
 
 import {store, setDataSetView, setSelectedRowID, setSelectedOptions} from "../assets/store"
 import {filterDataset, getOnlyKeys} from "../assets/dataset"
@@ -47,7 +48,7 @@ export default function Main({data}) {
   }
 
   return (
-      <div style={{height: 80 + "vh", margin: 0}}>
+      <div style={{ width: "100%", height: "75vh" }}>
       <h4>You are currently viewing top {barData.length} out of {data.length} items. Use the multi select below to remove or add filters. Clicking on a row allows you to see more details for a selected item.</h4>
       <Select
           closeMenuOnSelect={false}
@@ -62,7 +63,7 @@ export default function Main({data}) {
               keys={barKeys}
               indexBy={barIndexKey}
               onClick={onBarItemClick}
-              margin={{ top: 50, right: 50, bottom: 50, left: 250 }}
+              margin={{ top: 50, right: 100, bottom: 50, left: 250 }}
               padding={0.3}
               valueScale={{ type: 'linear' }}
               indexScale={{ type: 'band', round: true }}
@@ -118,6 +119,25 @@ export default function Main({data}) {
                   tickRotation: 0,
                   legendPosition: 'middle',
                   legendOffset: -40
+              }}
+              tooltip={({ id, value, color }) => (
+                  <div>
+                      <Chip color={color} />
+                      {value !== undefined ? (
+                          <span style={{ overflowWrap: "break-word" }}>
+                  {id}: <strong>{`${value}`}</strong>
+                </span>
+                      ) : (
+                          id
+                      )}
+                  </div>
+              )}
+              theme={{
+                  tooltip: {
+                      container: {
+                          width: "190px"
+                      }
+                  }
               }}
               labelSkipWidth={12}
               labelSkipHeight={12}

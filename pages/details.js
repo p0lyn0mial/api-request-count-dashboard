@@ -1,4 +1,5 @@
 import {ResponsiveBar} from "@nivo/bar";
+import { Chip } from "@nivo/tooltip"
 
 import {store} from "../assets/store"
 import {getOnlyKeys, filterDataset} from "../assets/dataset"
@@ -16,7 +17,7 @@ export default function Details() {
    }
 
    return(
-       <div style={{height: 95 + "vh"}}>
+       <div style={{ width: "100%", height: "80vh" }}>
            <h4>
                You are currently viewing {state.selectedRowID} with {barKeys.length} distinct values. To go to the previous page <button type="button" onClick={onGoBackClick} > click </button>
            </h4>
@@ -24,7 +25,7 @@ export default function Details() {
                data={barData}
                keys={barKeys}
                indexBy={barIndexKey}
-               margin={{ top: 50, right: 60, bottom: 50, left: 60 }}
+               margin={{ top: 50, right: 100, bottom: 50, left: 100 }}
                padding={0}
                minValue={0}
                groupMode="grouped"
@@ -68,6 +69,25 @@ export default function Details() {
                    tickRotation: 0,
                    legendPosition: 'middle',
                    legendOffset: -40
+               }}
+               tooltip={({ id, value, color }) => (
+                   <div>
+                       <Chip color={color} />
+                       {value !== undefined ? (
+                           <span style={{ overflowWrap: "break-word" }}>
+                  {id}: <strong>{`${value}`}</strong>
+                </span>
+                       ) : (
+                           id
+                       )}
+                   </div>
+               )}
+               theme={{
+                   tooltip: {
+                       container: {
+                           width: "190px"
+                       }
+                   }
                }}
                labelSkipWidth={12}
                labelSkipHeight={12}
