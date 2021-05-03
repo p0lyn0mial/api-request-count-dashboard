@@ -4,7 +4,7 @@ import { Chip } from "@nivo/tooltip"
 import {store} from "../assets/store"
 import {getOnlyKeys, filterDataset} from "../assets/dataset"
 
-export default function Details() {
+export default function Details({setComponentToDisplay}) {
    // common
    const barIndexKey = "key"
 
@@ -13,7 +13,7 @@ export default function Details() {
    const barKeys = getOnlyKeys(barData, barIndexKey)
 
    let onGoBackClick = () => {
-       window.location.href = "#main"
+       setComponentToDisplay("main")
    }
 
    return(

@@ -7,23 +7,21 @@ import {DataSet} from "../assets/requests-count"
 export default class Index extends React.Component {
     constructor(props) {
         super(props)
+
         // by default we are going to display the main page
         this.state = {page: "main"}
     }
 
-    // react to updates in the url address
-    onURLAddressChange = () => { this.setState({page: window.location.hash}) }
-
-    // register to updates in the url address
-    componentDidMount() { window.addEventListener("hashchange", this.onURLAddressChange) }
+    // this is a function used by the components to change the currently displayed component
+    updateComponentToDisplay = (newComponent) => { this.setState({page: newComponent}) }
 
     render() {
         let componentToDisplay
 
-        if (this.state.page === "#details") {
-            componentToDisplay = <Details/>
+        if (this.state.page === "details") {
+            componentToDisplay = <Details setComponentToDisplay={this.updateComponentToDisplay}/>
         } else {
-            componentToDisplay = <Main data={this.props.data}/>
+            componentToDisplay = <Main data={this.props.data} setComponentToDisplay={this.updateComponentToDisplay}/>
         }
 
         return(

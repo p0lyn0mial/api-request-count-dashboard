@@ -7,7 +7,7 @@ import { Chip } from "@nivo/tooltip"
 import {store, setDataSetView, setSelectedRowID, setSelectedOptions} from "../assets/store"
 import {filterDataset, getOnlyKeys} from "../assets/dataset"
 
-export default function Main({data}) {
+export default function Main({data, setComponentToDisplay}) {
   if (!Array.isArray(data)) { data = [] }
   const state = store.getState()
 
@@ -44,7 +44,7 @@ export default function Main({data}) {
   let onBarItemClick = (node, ev) => {
       store.dispatch(setDataSetView(barData))
       store.dispatch(setSelectedRowID(node.indexValue))
-      window.location.href = "#details"
+      setComponentToDisplay("details")
   }
 
   return (
